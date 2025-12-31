@@ -36,59 +36,59 @@ ML 엔지니어가 격리된 개발 환경에서 모델을 개발하고, 라벨�
 
 ```mermaid
 graph TB
-    subgraph "Multi-Cluster Management"
-        FLEET[Fleet Manager]
+    subgraph "멀티 클러스터 관리"
+        FLEET[Fleet 관리자]
         ARGO[ArgoCD<br/>GitOps]
     end
 
-    subgraph "API & Gateway Layer"
-        API[API Server<br/>REST API]
-        ISTIO_GW[Istio Gateway<br/>Service Mesh]
+    subgraph "API & 게이트웨이 레이어"
+        API[API 서버<br/>REST API]
+        ISTIO_GW[Istio 게이트웨이<br/>서비스 메시]
     end
 
-    subgraph "Identity & Security"
-        KEYCLOAK[Keycloak<br/>Identity Provider]
-        VAULT[Vault<br/>Secrets Management]
-        CILIUM[Cilium CNI<br/>Network Policy]
+    subgraph "인증 & 보안"
+        KEYCLOAK[Keycloak<br/>인증 제공자]
+        VAULT[Vault<br/>시크릿 관리]
+        CILIUM[Cilium CNI<br/>네트워크 정책]
     end
 
-    subgraph "Development Environment"
-        CONTROLLER[Dev Environment<br/>Controller]
+    subgraph "개발 환경"
+        CONTROLLER[개발 환경<br/>컨트롤러]
         DEV_NS[Namespace: mlops-dev<br/>Pod 단위 격리]
-        GPU[GPU Resources<br/>MIG/Time-Slicing/Full GPU]
+        GPU[GPU 리소스<br/>MIG/Time-Slicing/Full GPU]
     end
 
-    subgraph "MLOps Platform"
-        MLFLOW[MLflow<br/>Experiment Tracking]
-        KUBEFLOW[Kubeflow Pipelines<br/>Workflow Orchestration]
-        MODEL_REG[Model Registry<br/>MLflow]
+    subgraph "MLOps 플랫폼"
+        MLFLOW[MLflow<br/>실험 추적]
+        KUBEFLOW[Kubeflow Pipelines<br/>워크플로우 오케스트레이션]
+        MODEL_REG[모델 레지스트리<br/>MLflow]
     end
 
-    subgraph "Training Infrastructure"
+    subgraph "학습 인프라"
         TRAIN_NS[Namespace: mlops-training]
-        DIST_TRAIN[Distributed Training<br/>PyTorch DDP]
+        DIST_TRAIN[분산 학습<br/>PyTorch DDP]
     end
 
-    subgraph "Model Serving"
+    subgraph "모델 서빙"
         SERVING_NS[Namespace: mlops-serving]
-        KSERVE[KServe<br/>Batch & Real-time]
-        CANARY[Canary Deployment<br/>Istio Traffic Splitting]
+        KSERVE[KServe<br/>배치 & 실시간]
+        CANARY[카나리 배포<br/>Istio 트래픽 분할]
     end
 
-    subgraph "Data Management"
-        MINIO[MinIO<br/>Object Storage]
-        DVC[DVC<br/>Data Versioning]
-        LABELING[Labeling Service]
+    subgraph "데이터 관리"
+        MINIO[MinIO<br/>객체 스토리지]
+        DVC[DVC<br/>데이터 버전 관리]
+        LABELING[라벨링 서비스]
     end
 
-    subgraph "Observability"
-        OTEL[OpenTelemetry<br/>Collector]
-        SIGNOZ[SigNoz<br/>Logs + Metrics + Traces]
+    subgraph "관찰성"
+        OTEL[OpenTelemetry<br/>수집기]
+        SIGNOZ[SigNoz<br/>로그 + 메트릭 + 트레이스]
     end
 
-    subgraph "Shared Services"
-        POSTGRES[PostgreSQL<br/>MLflow Backend]
-        REDIS[Redis<br/>Cache]
+    subgraph "공유 서비스"
+        POSTGRES[PostgreSQL<br/>MLflow 백엔드]
+        REDIS[Redis<br/>캐시]
     end
 
     FLEET --> ISTIO_GW
@@ -120,23 +120,23 @@ graph TB
 
 ```mermaid
 flowchart LR
-    subgraph "Data Flow"
-        A[New Labeled Data] --> B[MinIO Data Lake]
-        B --> C[DVC Versioning]
-        C --> D{Threshold<br/>Reached?}
-        D -->|Yes| E[Kubeflow Pipeline<br/>Trigger]
-        D -->|No| F[Wait]
-        E --> G[Training Job]
-        G --> H[MLflow Tracking]
-        H --> I[Model Validation]
-        I --> J{Validation<br/>Pass?}
-        J -->|Yes| K[Model Registry<br/>Staging]
-        J -->|No| L[Reject]
-        K --> M[KServe Canary<br/>10% Traffic]
-        M --> N{Performance<br/>OK?}
-        N -->|Yes| O[Full Deployment<br/>100% Traffic]
-        N -->|No| P[Rollback]
-        O --> Q[Production Serving]
+    subgraph "데이터 흐름"
+        A[새로운 라벨링된 데이터] --> B[MinIO 데이터 레이크]
+        B --> C[DVC 버전 관리]
+        C --> D{임계값<br/>도달?}
+        D -->|Yes| E[Kubeflow 파이프라인<br/>트리거]
+        D -->|No| F[대기]
+        E --> G[학습 작업]
+        G --> H[MLflow 추적]
+        H --> I[모델 검증]
+        I --> J{검증<br/>통과?}
+        J -->|Yes| K[모델 레지스트리<br/>스테이징]
+        J -->|No| L[거부]
+        K --> M[KServe 카나리<br/>10% 트래픽]
+        M --> N{성능<br/>OK?}
+        N -->|Yes| O[전체 배포<br/>100% 트래픽]
+        N -->|No| P[롤백]
+        O --> Q[프로덕션 서빙]
     end
 ```
 
@@ -144,25 +144,25 @@ flowchart LR
 
 ```mermaid
 graph TB
-    subgraph "Kubernetes Cluster"
+    subgraph "Kubernetes 클러스터"
         subgraph "mlops-dev"
             DEV_POD1[Pod: dev-env-1<br/>GPU: 요구사항에 따라 할당]
             DEV_POD2[Pod: dev-env-2<br/>GPU: 요구사항에 따라 할당]
-            DEV_SVC1[Service: NodePort]
+            DEV_SVC1[서비스: NodePort]
         end
         
         subgraph "mlops-training"
-            TRAIN_JOB1[Job: training-1<br/>GPU: 요구사항에 따라 할당]
-            TRAIN_JOB2[Job: training-2<br/>GPU: 요구사항에 따라 할당]
+            TRAIN_JOB1[작업: training-1<br/>GPU: 요구사항에 따라 할당]
+            TRAIN_JOB2[작업: training-2<br/>GPU: 요구사항에 따라 할당]
         end
         
         subgraph "mlops-serving"
-            SERVING1[KServe: model-v1<br/>Canary 10%]
-            SERVING2[KServe: model-v2<br/>Canary 90%]
+            SERVING1[KServe: model-v1<br/>카나리 10%]
+            SERVING2[KServe: model-v2<br/>카나리 90%]
         end
         
         subgraph "mlops-platform"
-            MLFLOW_SVC[MLflow Server]
+            MLFLOW_SVC[MLflow 서버]
             MINIO_SVC[MinIO]
         end
     end
@@ -227,7 +227,7 @@ graph TB
 #### 6. OpenTelemetry + SigNoz
 - **역할**: 통합 옵저버빌리티 (로그, 메트릭, 트레이스)
 - **선택 이유**:
-  - 하나의 표준으로 모든 관찰 가능성 데이터 수집
+  - 하나의 표준으로 모든 옵저버빌리 데이터 수집
   - 로그/메트릭/트레이스 통합 관리
   - Istio와 통합 용이
 
@@ -262,60 +262,60 @@ graph TB
 
 ```mermaid
 sequenceDiagram
-    participant ML as ML Engineer
-    participant API as API Server
-    participant Controller as Dev Env Controller
+    participant ML as ML 엔지니어
+    participant API as API 서버
+    participant Controller as 개발 환경 컨트롤러
     participant K8s as Kubernetes
     participant Pod as GPU Pod
     participant MLflow as MLflow
-    participant Pipeline as Kubeflow Pipeline
+    participant Pipeline as Kubeflow 파이프라인
     participant DataLake as MinIO
 
     Note over ML,DataLake: 1. 개발 환경 요청
     ML->>API: POST /api/v1/environments<br/>{engineer_id, gpu_type, gpu_allocation}
-    API->>Controller: Create DevEnvironment CR
-    Controller->>K8s: Create Pod in mlops-dev
-    Controller->>K8s: Create Service (NodePort)
-    Controller->>K8s: Create PVC
-    K8s->>Pod: Schedule to GPU Node
-    Pod->>Pod: Initialize Container
-    Pod-->>Controller: Pod Ready
-    Controller-->>API: Environment Ready<br/>{node_port: 30001, access_url}
-    API-->>ML: Environment Details
+    API->>Controller: DevEnvironment CR 생성
+    Controller->>K8s: mlops-dev에 Pod 생성
+    Controller->>K8s: 서비스 생성 (NodePort)
+    Controller->>K8s: PVC 생성
+    K8s->>Pod: GPU 노드에 스케줄링
+    Pod->>Pod: 컨테이너 초기화
+    Pod-->>Controller: Pod 준비 완료
+    Controller-->>API: 환경 준비 완료<br/>{node_port: 30001, access_url}
+    API-->>ML: 환경 상세 정보
 
     Note over ML,DataLake: 2. IDE 접속 및 개발
-    ML->>Pod: Connect via NodePort<br/>http://node:30001
-    Pod-->>ML: VS Code Server Ready
-    ML->>Pod: Write Training Code
+    ML->>Pod: NodePort를 통해 연결<br/>http://node:30001
+    Pod-->>ML: VS Code 서버 Ready
+    ML->>Pod: 학습 코드 작성
 
     Note over ML,DataLake: 3. 데이터 준비
-    ML->>DataLake: Request Dataset
-    DataLake-->>ML: Dataset URL
-    ML->>Pod: Download Dataset
+    ML->>DataLake: 데이터셋 요청
+    DataLake-->>ML: 데이터셋 URL
+    ML->>Pod: 데이터셋 다운로드
 
     Note over ML,DataLake: 4. 실험 실행 및 추적
-    ML->>Pod: Run Training Script
-    Pod->>MLflow: Log Metrics, Params, Artifacts
-    MLflow-->>Pod: Tracking Confirmed
-    Pod->>Pod: Training Execution
-    Pod->>MLflow: Log Model Checkpoints
-    Pod->>MLflow: Log Final Metrics
-    Pod-->>ML: Training Complete
+    ML->>Pod: 학습 스크립트 실행
+    Pod->>MLflow: 메트릭, 파라미터, 아티팩트 로깅
+    MLflow-->>Pod: 추적 확인됨
+    Pod->>Pod: 학습 실행
+    Pod->>MLflow: 모델 체크포인트 로깅
+    Pod->>MLflow: 최종 메트릭 로깅
+    Pod-->>ML: 학습 완료
 
     Note over ML,DataLake: 5. 모델 등록
-    ML->>MLflow: Register Model (Experiment)
-    MLflow-->>ML: Model Registered
+    ML->>MLflow: 모델 등록 (실험)
+    MLflow-->>ML: 모델 등록됨
 
     Note over ML,DataLake: 6. 분산 학습 (선택적)
     alt 분산 학습 필요 시
-        ML->>Pipeline: Submit Distributed Training
-        Pipeline->>K8s: Create Multi-GPU Job
-        K8s->>K8s: Allocate Multiple GPU Resources
-        K8s->>K8s: Initialize DDP
-        K8s->>K8s: Distributed Training
-        K8s->>MLflow: Log Distributed Metrics
-        K8s-->>Pipeline: Training Complete
-        Pipeline-->>ML: Job Complete
+        ML->>Pipeline: 분산 학습 제출
+        Pipeline->>K8s: 멀티 GPU 작업 생성
+        K8s->>K8s: 여러 GPU 리소스 할당
+        K8s->>K8s: DDP 초기화
+        K8s->>K8s: 분산 학습
+        K8s->>MLflow: 분산 메트릭 로깅
+        K8s-->>Pipeline: 학습 완료
+        Pipeline-->>ML: 작업 완료
     end
 ```
 
@@ -323,94 +323,94 @@ sequenceDiagram
 
 ```mermaid
 sequenceDiagram
-    participant Labeler as Labeling Team
-    participant LabelSvc as Labeling Service
+    participant Labeler as 라벨링 팀
+    participant LabelSvc as 라벨링 서비스
     participant DataLake as MinIO
     participant DVC as DVC
-    participant Monitor as Data Monitor
-    participant Pipeline as Kubeflow Pipeline
+    participant Monitor as 데이터 모니터
+    participant Pipeline as Kubeflow 파이프라인
     participant MLflow as MLflow
-    participant Validator as Model Validator
-    participant Registry as Model Registry
+    participant Validator as 모델 검증기
+    participant Registry as 모델 레지스트리
     participant KServe as KServe
-    participant Istio as Istio Gateway
-    participant Traffic as Production Traffic
+    participant Istio as Istio 게이트웨이
+    participant Traffic as 프로덕션 트래픽
 
     Note over Labeler,Traffic: 1. 새로운 데이터 라벨링
-    Labeler->>LabelSvc: Label New Data
-    LabelSvc->>DataLake: Save Labeled Data
-    DataLake->>DVC: Version Dataset
-    DVC-->>LabelSvc: Dataset Versioned
-    LabelSvc-->>Labeler: Labeling Complete
+    Labeler->>LabelSvc: 새 데이터 라벨링
+    LabelSvc->>DataLake: 라벨링된 데이터 저장
+    DataLake->>DVC: 데이터셋 버전 관리
+    DVC-->>LabelSvc: 데이터셋 버전 관리됨
+    LabelSvc-->>Labeler: 라벨링 완료
 
     Note over Labeler,Traffic: 2. 데이터 누적 모니터링
-    DataLake->>Monitor: Update Data Count
-    Monitor->>Monitor: Check Threshold
-    alt Threshold Reached
-        Monitor->>Pipeline: Trigger Retraining Pipeline
-    else Threshold Not Reached
-        Monitor->>Monitor: Continue Monitoring
+    DataLake->>Monitor: 데이터 카운트 업데이트
+    Monitor->>Monitor: 임계값 확인
+    alt 임계값 도달
+        Monitor->>Pipeline: 재학습 파이프라인 트리거
+    else 임계값 미도달
+        Monitor->>Monitor: 모니터링 계속
     end
 
     Note over Labeler,Traffic: 3. 자동 재학습 트리거
-    Pipeline->>DataLake: Fetch Latest Dataset
-    DataLake-->>Pipeline: Dataset URL
-    Pipeline->>Registry: Load Base Model (Production)
-    Registry-->>Pipeline: Model Artifacts
-    Pipeline->>MLflow: Start New Experiment
-    MLflow-->>Pipeline: Experiment ID
+    Pipeline->>DataLake: 최신 데이터셋 가져오기
+    DataLake-->>Pipeline: 데이터셋 URL
+    Pipeline->>Registry: 기본 모델 로드 (프로덕션)
+    Registry-->>Pipeline: 모델 아티팩트
+    Pipeline->>MLflow: 새 실험 시작
+    MLflow-->>Pipeline: 실험 ID
 
     Note over Labeler,Traffic: 4. 전이학습 수행
-    Pipeline->>Pipeline: Initialize Model with<br/>Base Model Weights
-    Pipeline->>Pipeline: Fine-tune on New Data
-    Pipeline->>MLflow: Log Training Metrics
-    Pipeline->>MLflow: Log Hyperparameters
-    Pipeline->>MLflow: Save Model Checkpoints
-    Pipeline-->>Pipeline: Training Complete
+    Pipeline->>Pipeline: 기본 모델 가중치로<br/>모델 초기화
+    Pipeline->>Pipeline: 새 데이터로 파인튜닝
+    Pipeline->>MLflow: 학습 메트릭 로깅
+    Pipeline->>MLflow: 하이퍼파라미터 로깅
+    Pipeline->>MLflow: 모델 체크포인트 저장
+    Pipeline-->>Pipeline: 학습 완료
 
     Note over Labeler,Traffic: 5. 모델 검증
-    Pipeline->>Validator: Request Model Validation
-    Validator->>DataLake: Load Validation Dataset
-    Validator->>MLflow: Load Trained Model
-    Validator->>Validator: Run Validation Tests
-    Validator->>Validator: Calculate Metrics
-    alt Validation Passed
-        Validator->>Registry: Promote to Staging
-        Registry->>Registry: Update Model Stage
-        Registry-->>Pipeline: Model in Staging
-    else Validation Failed
-        Validator->>Registry: Reject Model
-        Registry-->>Pipeline: Model Rejected
-        Pipeline->>MLflow: Log Failure Reason
+    Pipeline->>Validator: 모델 검증 요청
+    Validator->>DataLake: 검증 데이터셋 로드
+    Validator->>MLflow: 학습된 모델 로드
+    Validator->>Validator: 검증 테스트 실행
+    Validator->>Validator: 메트릭 계산
+    alt 검증 통과
+        Validator->>Registry: 스테이징으로 승격
+        Registry->>Registry: 모델 단계 업데이트
+        Registry-->>Pipeline: 스테이징 모델
+    else 검증 실패
+        Validator->>Registry: 모델 거부
+        Registry-->>Pipeline: 모델 거부됨
+        Pipeline->>MLflow: 실패 이유 로깅
     end
 
-    Note over Labeler,Traffic: 6. Canary 배포 (검증 통과 시)
-    alt Model in Staging
-        Pipeline->>KServe: Deploy Model (Canary)
-        KServe->>Istio: Configure Traffic Split (10%)
-        Istio->>Traffic: Route 10% to New Model
-        Istio->>Traffic: Route 90% to Old Model
+    Note over Labeler,Traffic: 6. 카나리 배포 (검증 통과 시)
+    alt 스테이징 모델
+        Pipeline->>KServe: 모델 배포 (카나로 배포 예시)
+        KServe->>Istio: 트래픽 분할 구성 (10%)
+        Istio->>Traffic: 새 모델로 10% 라우팅
+        Istio->>Traffic: 기존 모델로 90% 라우팅
         
         Note over Istio,Traffic: 7. 성능 모니터링
-        Traffic->>Istio: Request Traffic
-        Istio->>KServe: Forward to Model
-        KServe-->>Istio: Prediction Results
-        Istio->>Monitor: Collect Performance Metrics
-        Monitor->>Monitor: Compare Old vs New Model
+        Traffic->>Istio: 트래픽 요청
+        Istio->>KServe: 모델로 전달
+        KServe-->>Istio: 예측 결과
+        Istio->>Monitor: 성능 메트릭 수집
+        Monitor->>Monitor: 기존 vs 새 모델 비교
         
-        alt Performance OK
-            Monitor->>Istio: Approve Full Deployment
-            Istio->>Istio: Update Traffic Split (100%)
-            Istio->>Traffic: Route 100% to New Model
-            Istio->>Registry: Promote to Production
-            Registry->>Registry: Update Model Stage
-            Registry-->>KServe: Model in Production
-        else Performance Degraded
-            Monitor->>Istio: Trigger Rollback
-            Istio->>Istio: Revert Traffic Split (0%)
-            Istio->>Traffic: Route 100% to Old Model
-            Istio->>Registry: Keep Old Model in Production
-            Registry-->>Pipeline: Rollback Complete
+        alt 성능 OK
+            Monitor->>Istio: 전체 배포 승인
+            Istio->>Istio: 트래픽 분할 업데이트 (100%)
+            Istio->>Traffic: 새 모델로 100% 라우팅
+            Istio->>Registry: 프로덕션으로 승격
+            Registry->>Registry: 모델 단계 업데이트
+            Registry-->>KServe: 프로덕션 모델
+        else 성능 저하
+            Monitor->>Istio: 롤백 트리거
+            Istio->>Istio: 트래픽 분할 되돌리기 (0%)
+            Istio->>Traffic: 기존 모델로 100% 라우팅
+            Istio->>Registry: 프로덕션에서 기존 모델 유지
+            Registry-->>Pipeline: 롤백 완료
         end
     end
 ```
@@ -419,36 +419,36 @@ sequenceDiagram
 
 ```mermaid
 sequenceDiagram
-    participant Client as Client Application
-    participant LabelTool as Labeling Tool
-    participant Istio as Istio Gateway
+    participant Client as 클라이언트 애플리케이션
+    participant LabelTool as 라벨링 도구
+    participant Istio as Istio 게이트웨이
     participant KServe as KServe
-    participant Batch as Batch Serving
-    participant Realtime as Real-time Serving
-    participant Model as Model Instance
+    participant Batch as 배치 서빙
+    participant Realtime as 실시간 서빙
+    participant Model as 모델 인스턴스
 
-    Note over Client,Model: One-by-One 서빙 (Real-time)
-    LabelTool->>Istio: POST /predict (Single Request)
-    Istio->>Istio: JWT Authentication
-    Istio->>Realtime: Forward Request
-    Realtime->>Model: Load Model & Predict
-    Model-->>Realtime: Prediction Result
-    Realtime-->>Istio: Return Result
-    Istio-->>LabelTool: Prediction (Pre-filled)
-    LabelTool->>LabelTool: Labeler Review/Edit
-    LabelTool->>LabelTool: Save Final Label
+    Note over Client,Model: One-by-One 서빙 (실시간)
+    LabelTool->>Istio: POST /predict (단일 요청)
+    Istio->>Istio: JWT 인증
+    Istio->>Realtime: 요청 전달
+    Realtime->>Model: 모델 로드 & 예측
+    Model-->>Realtime: 예측 결과
+    Realtime-->>Istio: 결과 반환
+    Istio-->>LabelTool: 예측 (사전 채워짐)
+    LabelTool->>LabelTool: 라벨러 검토/편집
+    LabelTool->>LabelTool: 최종 라벨 저장
 
-    Note over Client,Model: Batch 서빙
-    Client->>Istio: POST /batch-predict (Dataset)
-    Istio->>Istio: JWT Authentication
-    Istio->>Batch: Submit Batch Job
-    Batch->>Model: Load Model
-    Batch->>Batch: Process Dataset in Batches
-    Batch->>Model: Batch Predictions
-    Model-->>Batch: Batch Results
-    Batch->>Batch: Aggregate Results
-    Batch-->>Istio: Complete Batch Results
-    Istio-->>Client: Batch Predictions (Pseudo Labels)
+    Note over Client,Model: 배치 서빙
+    Client->>Istio: POST /batch-predict (데이터셋)
+    Istio->>Istio: JWT 인증
+    Istio->>Batch: 배치 작업 제출
+    Batch->>Model: 모델 로드
+    Batch->>Batch: 배치로 데이터셋 처리
+    Batch->>Model: 배치 예측
+    Model-->>Batch: 배치 결과
+    Batch->>Batch: 결과 집계
+    Batch-->>Istio: 배치 결과 완료
+    Istio-->>Client: 배치 예측 (의사 라벨)
 ```
 
 ---
@@ -490,15 +490,15 @@ sequenceDiagram
 
 ### 최종 기술 스택
 
-| 카테고리 | 기술 | 선택 이유 |
-|---------|------|----------|
-| **멀티클러스터 관리** | Fleet + ArgoCD | 클러스터 수준 관리 + GitOps 배포 |
+| 카테고리                     | 기술 | 선택 이유 |
+|--------------------------|------|----------|
+| **멀티클러스터 관리**            | Fleet + ArgoCD | 클러스터 수준 관리 + GitOps 배포 |
 | **서비스 메시 & API Gateway** | Istio (Envoy) | 서비스 메시와 API Gateway 통합, L7 제어, 제로 트러스트, 자동 모니터링 |
-| **네트워크 보안** | Cilium CNI | CNI 및 네트워크 레벨 정책 (L3/L4), eBPF 기반 고성능 |
-| **Identity & Access** | Keycloak + Vault | OIDC/OAuth2 지원, 중앙화된 시크릿 관리 |
-| **관찰 가능성** | OpenTelemetry + SigNoz | 통합 표준, 올인원 솔루션, 고성능 |
-| **MLOps 플랫폼** | MLflow + Kubeflow + KServe | 실험 추적, 파이프라인, 서빙 통합 |
-| **데이터** | MinIO + PostgreSQL + Redis | S3 호환, 관계형 DB, 캐싱 |
+| **네트워크 보안**              | Cilium CNI | CNI 및 네트워크 레벨 정책 (L3/L4), eBPF 기반 고성능 |
+| **Identity & Access**    | Keycloak + Vault | OIDC/OAuth2 지원, 중앙화된 시크릿 관리 |
+| **옵저버빌리**                | OpenTelemetry + SigNoz | 통합 표준, 올인원 솔루션, 고성능 |
+| **MLOps 플랫폼**            | MLflow + Kubeflow + KServe | 실험 추적, 파이프라인, 서빙 통합 |
+| **데이터**                  | MinIO + PostgreSQL + Redis | S3 호환, 관계형 DB, 캐싱 |
 
 **Cilium과 Istio의 역할 분리**:
 - **Cilium**: CNI로 네트워크 레벨 정책 (L3/L4), Pod 간 기본 네트워크 격리
@@ -511,36 +511,36 @@ sequenceDiagram
 
 | 항목 | Istio | Kong | Traefik |
 |------|-------|------|---------|
-| **서비스 메시** | ⭐⭐⭐⭐⭐ | ❌ | ❌ |
-| **API Gateway** | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐ |
-| **제로 트러스트** | ⭐⭐⭐⭐⭐ | ⭐⭐⭐ | ⭐⭐ |
-| **모니터링 통합** | ⭐⭐⭐⭐⭐ | ⭐⭐⭐ | ⭐⭐ |
-| **멀티클러스터** | ⭐⭐⭐⭐⭐ | ⭐⭐⭐ | ⭐⭐ |
-| **선택** | ✅ | ❌ | ❌ |
+| **서비스 메시** | 상 | 미지원 | 미지원 |
+| **API Gateway** | 상 | 상 | 상 |
+| **제로 트러스트** | 상 | 중 | 하 |
+| **모니터링 통합** | 상 | 중 | 하 |
+| **멀티클러스터** | 상 | 중 | 하 |
+| **선택** | 선택 | - | - |
 
 **선택 이유**: Istio는 서비스 메시와 API Gateway를 통합 제공하며, OpenTelemetry와 완벽 통합되어 자동 모니터링이 가능합니다.
 
-#### 관찰 가능성
+#### 옵저버빌리티
 
 | 항목 | OpenTelemetry + SigNoz | Prometheus + Loki + Tempo + Grafana |
 |------|------------------------|-------------------------------------|
-| **통합성** | ⭐⭐⭐⭐⭐ | ⭐⭐⭐ |
-| **표준화** | ⭐⭐⭐⭐⭐ | ⭐⭐⭐ |
-| **성능** | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐ |
-| **운영 복잡도** | ⭐⭐⭐⭐ | ⭐⭐ |
-| **선택** | ✅ | ❌ |
+| **통합성** | 상 | 중 |
+| **표준화** | 상 | 중 |
+| **성능** | 상 | 상 |
+| **운영 복잡도** | 상 | 하 |
+| **선택** | 선택 | - |
 
 **선택 이유**: OpenTelemetry는 업계 표준이며, SigNoz는 로그/메트릭/트레이스를 하나의 플랫폼에서 통합 관리할 수 있습니다.
 
 #### MLOps 플랫폼
 
-| 항목 | MLflow | Kubeflow | Weights & Biases |
-|------|--------|----------|------------------|
-| **실험 추적** | ⭐⭐⭐⭐⭐ | ⭐⭐⭐ | ⭐⭐⭐⭐⭐ |
-| **모델 레지스트리** | ⭐⭐⭐⭐⭐ | ⭐⭐⭐ | ⭐⭐⭐ |
-| **파이프라인** | ⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐ |
-| **오픈소스** | ✅ | ✅ | ❌ |
-| **선택** | ✅ (추적) | ✅ (파이프라인) | ❌ |
+| 항목 | MLflow | Kubeflow |
+|------|--------|----------|
+| **실험 추적** | 상 | 중 |
+| **모델 레지스트리** | 상 | 중 |
+| **파이프라인** | 하 | 상 |
+| **오픈소스** | 지원 | 지원 |
+| **선택** | 선택 (추적) | 선택 (파이프라인) |
 
 **선택 이유**: MLflow는 실험 추적과 모델 레지스트리에 우수하며, Kubeflow는 Kubernetes 네이티브 파이프라인 오케스트레이션에 적합합니다.
 
@@ -560,11 +560,9 @@ sequenceDiagram
   - Time-Slicing: 시간 분할 방식으로 여러 Pod이 GPU 공유
   - 전체 GPU 할당: 성능이 중요한 작업에 전체 GPU 할당
   - 요구사항에 따라 적절한 방식 선택
-- **리소스 큐 시스템**: GPU 요청을 큐에 넣고 우선순위 기반으로 할당
-- **스케줄링 정책**: 
-  - 개발 환경: 시간 제한 (예: 8시간 후 자동 종료)
-  - 학습 작업: 우선순위 큐 (프로덕션 재학습 > 실험)
+- **리소스 큐 시스템**: GPU 요청을 큐에 넣고 우선순위 기반으로 할당 (학습시 활용)
 - **리소스 풀 분리**: 개발용 GPU 풀과 학습용 GPU 풀 분리
+- **모니터링**: 할당하고 사용하지 않는 GPU 모니터링 (엔지니어에게 제공된 경우)
 
 ### 2. 모델 버전 관리 복잡성
 
@@ -574,39 +572,22 @@ sequenceDiagram
 
 **해결 방안**:
 - **모델 아티팩트 정책**: 
-  - 오래된 모델 자동 아카이빙 (MinIO Lifecycle Policy)
+  - 오래된 모델 자동 아카이빙 (MinIO Lifecycle)
   - 실험 단계 모델은 일정 기간 후 자동 삭제
 - **버전 태깅**: Git 태그와 모델 버전을 연결하여 추적
 - **모델 메타데이터**: 모델 레지스트리에 코드 커밋 해시 저장
 
-### 3. 분산 학습 통신 오버헤드
-
-**문제**:
-- 여러 GPU 간 통신으로 인한 병목 현상
-- 네트워크 대역폭 부족
-
-**해결 방안**:
-- **고속 네트워크**: InfiniBand 또는 고속 이더넷 사용
-- **통신 최적화**: 
-  - Gradient 압축 (Gradient Compression)
-  - AllReduce 최적화 알고리즘 사용
-- **로컬성 고려**: 같은 노드의 GPU를 우선적으로 할당
-- **비동기 업데이트**: 완전 동기화 대신 비동기 SGD 고려
-
-### 4. 자동 재학습 트리거 최적화
+### 3. 자동 재학습 트리거 최적화
 
 **문제**:
 - 데이터 임계값 설정이 어려움 (너무 낮으면 빈번한 재학습, 너무 높으면 반영 지연)
 - 재학습 중 리소스 경쟁
 
 **해결 방안**:
-- **적응형 임계값**: 
-  - 데이터 품질과 양을 모두 고려
-  - 모델 성능 저하 감지 시 임계값 낮춤
 - **스케줄링**: 재학습을 비피크 시간에 실행
 - **점진적 학습**: 전체 재학습 대신 증분 학습 고려
 
-### 5. Canary 배포 실패 시 롤백
+### 4. Canary 배포 실패 시 롤백
 
 **문제**:
 - 새 모델 배포 후 성능 저하 감지 시 빠른 롤백 필요
@@ -614,27 +595,12 @@ sequenceDiagram
 
 **해결 방안**:
 - **자동 롤백**: 
-  - 실시간 메트릭 모니터링 (SigNoz를 통한 지연시간, 에러율 등)
+  - 실시간 메트릭 모니터링 (지연시간, 에러율 등)
   - 임계값 초과 시 자동 롤백 트리거
 - **Istio 트래픽 분할**: 점진적 전환 (10% → 50% → 100%)
 - **블루-그린 배포**: 롤백 시 즉시 전환 가능한 구조
 
-### 6. 데이터 품질 문제
-
-**문제**:
-- 라벨링 오류로 인한 모델 성능 저하
-- 데이터 분포 변화 (Data Drift)
-
-**해결 방안**:
-- **데이터 검증**: 
-  - 라벨링 데이터 자동 검증 (통계적 이상치 탐지)
-  - 데이터 스키마 검증
-- **Data Drift 감지**: 
-  - 프로덕션 데이터와 학습 데이터 분포 비교
-  - 자동 알림 및 재학습 트리거
-- **라벨링 품질 관리**: 라벨러 간 일관성 검사
-
-### 7. 개발 환경 격리 및 보안
+### 6. 개발 환경 격리 및 보안
 
 **문제**:
 - 여러 엔지니어가 같은 클러스터를 사용할 때 보안 및 격리 우려
@@ -648,22 +614,7 @@ sequenceDiagram
 - **Vault**: Kubernetes Secrets 또는 Vault를 통한 민감 정보 관리
 - **이미지 스캔**: 컨테이너 이미지 보안 취약점 스캔
 
-### 8. 모델 서빙 지연시간
-
-**문제**:
-- Real-time 서빙에서 높은 지연시간
-- 동시 요청 처리 능력 부족
-
-**해결 방안**:
-- **모델 최적화**: 
-  - 모델 양자화 (Quantization)
-  - 모델 압축 (Pruning)
-  - TensorRT, ONNX Runtime 등 최적화 런타임 사용
-- **캐싱**: 자주 사용되는 예측 결과 캐싱 (Redis)
-- **자동 스케일링**: KServe의 자동 스케일링 활용
-- **배치 처리**: 가능한 경우 여러 요청을 배치로 처리
-
-### 9. 비용 관리
+### 7. 비용 관리
 
 **문제**:
 - GPU 리소스 사용으로 인한 높은 비용
@@ -678,20 +629,7 @@ sequenceDiagram
 - **리소스 할당량**: 엔지니어별 GPU 사용 시간 제한
 - **비용 알림**: 예산 초과 시 자동 알림
 
-### 10. 재현성 보장
-
-**문제**:
-- 동일한 코드와 데이터로도 다른 결과 발생
-- 환경 차이로 인한 재현성 문제
-
-**해결 방안**:
-- **컨테이너 이미지 버전 관리**: 학습에 사용된 정확한 환경 저장
-- **시드 고정**: 랜덤 시드 고정으로 재현성 보장
-- **의존성 고정**: Python 패키지 버전 명시 (requirements.txt, poetry.lock)
-- **하드웨어 추적**: 사용된 GPU 모델 및 드라이버 버전 기록
-- **실험 메타데이터**: MLflow에 모든 실험 파라미터와 환경 정보 자동 기록
-
-### 11. 멀티클러스터 관리 복잡성
+### 8. 멀티클러스터 관리 복잡성
 
 **문제**:
 - 여러 클러스터 간 일관성 유지 어려움
@@ -701,9 +639,9 @@ sequenceDiagram
 - **Fleet + ArgoCD**: 중앙화된 클러스터 및 애플리케이션 관리
 - **Istio Multi-Primary**: 클러스터 간 서비스 메시 통합
 - **정책 자동화**: GitOps를 통한 정책 자동 배포
-- **모니터링 통합**: SigNoz를 통한 멀티클러스터 관찰 가능성
+- **모니터링 통합**: SigNoz를 통한 멀티클러스터 옵저버빌리
 
-### 12. 관찰 가능성 데이터 과부하
+### 9. 옵저버빌리 데이터 과부하
 
 **문제**:
 - 대량의 로그, 메트릭, 트레이스 데이터로 인한 저장소 부담
@@ -714,132 +652,3 @@ sequenceDiagram
 - **데이터 보존 정책**: 오래된 데이터 자동 아카이빙
 - **ClickHouse 최적화**: SigNoz의 ClickHouse 기반 고성능 쿼리
 - **인덱싱**: 자주 조회하는 데이터 인덱싱
-
----
-
-## 구현 계획
-
-### Phase 1: 기본 인프라 (1-2개월)
-
-1. **네임스페이스 및 기본 리소스**
-   - 네임스페이스 생성 (mlops-dev, mlops-training, mlops-serving 등)
-   - ResourceQuota 및 LimitRange 설정
-   - 기본 네트워크 정책
-
-2. **CRD 정의**
-   - DevEnvironment CRD 정의
-   - Custom Resource 스키마 설계
-
-3. **멀티클러스터 관리**
-   - Fleet 설치 및 클러스터 등록
-   - ArgoCD 설치 및 구성
-
-### Phase 2: 서비스 메시 & 보안 (2-3개월)
-
-1. **Istio 설치**
-   - Istio Multi-Primary 구성
-   - mTLS 활성화
-   - Gateway 및 VirtualService 구성
-
-2. **네트워크 보안**
-   - Cilium CNI 설치
-   - 네트워크 정책 정의
-   - AuthorizationPolicy 구성
-
-3. **Identity & Access**
-   - Keycloak 설치 및 구성
-     - Realm 및 클라이언트 생성
-     - 역할 정의 (관리자, ML 엔지니어, 데이터 엔지니어 등)
-     - 사용자 및 역할 할당
-   - Vault 설치 및 Kubernetes 통합
-     - Vault Policy 정의
-     - Kubernetes 인증 설정
-   - OIDC 연동
-   - Istio RequestAuthentication 설정
-   - 역할 기반 AuthorizationPolicy 구성
-
-### Phase 3: 관찰 가능성 (1-2개월)
-
-1. **OpenTelemetry**
-   - OpenTelemetry Operator 설치
-   - OpenTelemetry Collector 배포
-   - Istio와 OpenTelemetry 통합
-
-2. **SigNoz**
-   - SigNoz 설치 및 구성
-   - ClickHouse 스토리지 설정
-   - 대시보드 구성
-
-### Phase 4: 개발 환경 관리 (2-3개월)
-
-1. **Controller 구현**
-   - DevEnvironment Controller 개발
-   - Port Manager 구현
-   - Resource Scheduler 구현
-
-2. **API 서버**
-   - REST API 서버 구현
-   - 환경 생성/조회/삭제 API
-   - 인증 및 권한 관리
-
-3. **GPU 할당 설정**
-   - GPU 노드 구성 (MIG, Time-Slicing 등)
-   - 다양한 GPU 할당 방식 지원
-   - Device Plugin 구성
-
-### Phase 5: MLOps 플랫폼 (2-3개월)
-
-1. **MLflow**
-   - MLflow 서버 설치
-   - PostgreSQL 백엔드 구성
-   - 모델 레지스트리 설정
-
-2. **Kubeflow Pipelines**
-   - Kubeflow 설치
-   - 파이프라인 컴포넌트 개발
-   - 자동 재학습 트리거 구현
-
-3. **KServe**
-   - KServe 설치
-   - 모델 서빙 인프라 구축
-   - Canary 배포 구현
-
-### Phase 6: 통합 및 테스트 (1-2개월)
-
-1. **통합 테스트**
-   - 전체 워크플로우 테스트
-   - 성능 테스트
-   - 보안 테스트
-
-2. **문서화**
-   - 사용자 가이드 작성
-   - 운영 매뉴얼 작성
-   - 트러블슈팅 가이드
-
-### Phase 7: 운영 및 모니터링 (지속)
-
-1. **모니터링**
-   - SigNoz 대시보드 최적화
-   - 알림 규칙 설정
-   - 성능 메트릭 수집
-
-2. **최적화**
-   - 리소스 사용량 최적화
-   - 비용 최적화
-   - 성능 튜닝
-
----
-
-## 결론
-
-본 MLOps 플랫폼은 다음과 같은 특징을 가집니다:
-
-1. **확장성**: 멀티클러스터 지원 및 수백 명의 개발자 지원
-2. **보안**: 제로 트러스트 네트워킹 및 세밀한 접근 제어
-3. **효율성**: 다양한 GPU 할당 방식 지원 및 자동화된 리소스 관리
-4. **관찰 가능성**: OpenTelemetry + SigNoz를 통한 통합 관찰 가능성
-5. **자동화**: GitOps 기반 배포 및 자동 재학습
-6. **안정성**: Canary 배포 및 자동 롤백
-
-이 플랫폼을 통해 ML 엔지니어는 격리된 환경에서 효율적으로 모델을 개발하고, 자동화된 파이프라인을 통해 지속적으로 모델을 개선하며, 안전하게 배포할 수 있습니다.
-
